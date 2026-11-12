@@ -2,6 +2,7 @@ import { useRouteScroll } from "@/hooks/useRouteScroll";
 import { Outlet, useLocation } from "react-router";
 import { Leaf, Sprout } from "lucide-react";
 import { Brand } from "@/components/layout/Brand";
+import { IcpBeian } from "@/components/layout/IcpBeian";
 import { Navigation } from "@/components/layout/Navigation";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
 import { HeaderActions } from "@/components/layout/HeaderActions";
@@ -53,7 +54,7 @@ export const GardenLayout = () => {
             <Outlet />
             <footer className="fg-page-footer">
               <span>每一份专注，都值得被温柔以待。</span>
-              <span>FOCUS GARDEN</span>
+              <IcpBeian className="fg-icp-beian" />
             </footer>
           </div>
         </main>

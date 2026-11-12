@@ -658,9 +658,17 @@ p {
   font-size: 10px;
   color: var(--subtle);
 }
-.fg-page-footer > span:last-child {
+.fg-icp-beian {
+  color: inherit;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.fg-icp-beian:hover {
+  text-decoration: underline;
+}
+.fg-page-footer .fg-icp-beian {
   font-size: 9px;
-  letter-spacing: 2px;
 }
 .fg-panel-title {
   display: flex;
@@ -1437,7 +1445,7 @@ p {
     gap: 8px;
     font-size: 9px;
   }
-  .fg-page-footer > span:last-child {
+  .fg-page-footer .fg-icp-beian {
     font-size: 8px;
   }
   .fg-records-summary {

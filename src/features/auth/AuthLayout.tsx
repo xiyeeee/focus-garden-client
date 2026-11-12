@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Sprout } from "lucide-react";
 import { Brand } from "@/components/layout/Brand";
+import { IcpBeian } from "@/components/layout/IcpBeian";
 import { SeedlingPreview } from "@/components/garden/SeedlingPreview";
 import { LoginArtwork } from "./LoginArtwork";
 import "./login.css";
@@ -55,7 +56,10 @@ export const AuthLayout = ({ children }: { children: ReactNode }) => (
     </main>
     <footer className="fg-login-footer">
       <span aria-hidden="true" />
-      <p>专注花园 · 让专注自然生长</p>
+      <div className="fg-login-footer-copy">
+        <p>专注花园 · 让专注自然生长</p>
+        <IcpBeian className="fg-icp-beian" />
+      </div>
       <span aria-hidden="true" />
     </footer>
   </div>

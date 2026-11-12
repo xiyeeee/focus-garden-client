@@ -362,6 +362,17 @@
   height: 1px;
   background: color-mix(in srgb, var(--muted-foreground) 45%, transparent);
 }
+.fg-login-footer-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.fg-login-footer-copy .fg-icp-beian {
+  font-family: var(--font-body, inherit);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
 .fg-visitor-avatar:hover {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
 }
