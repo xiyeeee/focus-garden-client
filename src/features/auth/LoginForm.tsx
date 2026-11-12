@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
-import { LoaderCircle, Mail } from "lucide-react";
+import { LoaderCircle, Mail, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError, errorMessage } from "@/services/http";
 import { useCooldown } from "@/hooks/useCooldown";
@@ -9,8 +9,11 @@ import {
   validateLogin,
   type LoginErrors,
   type LoginSubmit,
+  type LoginMode,
 } from "./login-form";
-export const LoginForm = ({ onSubmit }: { onSubmit: LoginSubmit }) => {
+export const LoginForm = ({ onSubmit, initialMode = "username" }: { onSubmit: LoginSubmit; initialMode?: LoginMode }) => {
+  const [mode, setMode] = useState<LoginMode>(initialMode);
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<LoginErrors>({});
@@ -18,22 +21,23 @@ export const LoginForm = ({ onSubmit }: { onSubmit: LoginSubmit }) => {
   const [submitError, setSubmitError] = useState("");
   const pending = useRef(false);
   const cooldown = useCooldown();
+  const credentials = mode === "username" ? { username, password } : { email, password };
   const validateField = (field: keyof LoginErrors) =>
     setErrors((current) => ({
       ...current,
-      [field]: validateLogin({ email, password })[field],
+      [field]: validateLogin(credentials)[field],
     }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (pending.current || cooldown.seconds > 0) return;
-    const fieldErrors = validateLogin({ email, password });
+    const fieldErrors = validateLogin(credentials);
     setErrors(fieldErrors);
     setSubmitError("");
     if (Object.keys(fieldErrors).length) return;
     pending.current = true;
     setSubmitting(true);
     try {
-      await onSubmit({ email: email.trim().toLowerCase(), password });
+      await onSubmit(credentials);
     } catch (error) {
       setSubmitError(errorMessage(error));
       if (error instanceof ApiError && error.status === 429)
@@ -48,11 +52,28 @@ export const LoginForm = ({ onSubmit }: { onSubmit: LoginSubmit }) => {
       className="fg-login-form"
       noValidate
       onSubmit={(event) => void submit(event)}
-      aria-label="邮箱密码登录"
+      aria-label={mode === "username" ? "用户名密码登录" : "邮箱密码登录"}
     >
+      <div className="fg-login-modes" role="group" aria-label="登录方式">
+        {(["username", "email"] as const).map((option) => (
+          <Button key={option} type="button" variant="ghost"
+            aria-pressed={mode === option} disabled={submitting}
+            onClick={() => { setMode(option); setErrors({}); setSubmitError(""); }}>
+            {option === "username" ? "用户名登录" : "邮箱登录"}
+          </Button>
+        ))}
+      </div>
       <fieldset disabled={submitting}>
         <legend className="sr-only">登录信息</legend>
-        <AuthTextField
+        {mode === "username" ? (
+          <AuthTextField id="login-username" label="用户名" icon={UserRound}
+            name="username" autoComplete="username" placeholder="请输入用户名"
+            value={username} onChange={(event) => {
+              setUsername(event.target.value);
+              setErrors((current) => ({ ...current, identity: undefined }));
+              setSubmitError("");
+            }} onBlur={() => validateField("identity")} error={errors.identity} required />
+        ) : (<AuthTextField
           id="login-email"
           label="邮箱"
           icon={Mail}
@@ -65,13 +86,14 @@ export const LoginForm = ({ onSubmit }: { onSubmit: LoginSubmit }) => {
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
-            setErrors((current) => ({ ...current, email: undefined }));
+            setErrors((current) => ({ ...current, identity: undefined }));
             setSubmitError("");
           }}
-          onBlur={() => validateField("email")}
-          error={errors.email}
+          onBlur={() => validateField("identity")}
+          error={errors.identity}
           required
         />
+        )}
         <AuthPasswordField
           id="login-password"
           label="密码"
@@ -88,11 +110,11 @@ export const LoginForm = ({ onSubmit }: { onSubmit: LoginSubmit }) => {
           error={errors.password}
           required
         />
-        <div className="fg-login-forgot">
+        {mode === "email" ? <div className="fg-login-forgot">
           <Link to="/forgot-password" className="fg-auth-text-link">
             忘记密码？
           </Link>
-        </div>
+        </div> : <p className="fg-login-help">用户名账号暂不支持邮箱找回密码。</p>}
         <Button
           type="submit"
           className="fg-login-submit"

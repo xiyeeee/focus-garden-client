@@ -44,6 +44,7 @@ test("注册发码保留前导零，成功回登录但不自动进入首页", as
 test("密码重置使用独立用途和 newPassword，完成后回登录", async ({ page }) => {
   const auth = await interceptAuthService(page);
   await page.goto("/login");
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   await page.getByRole("link", { name: "忘记密码？", exact: true }).click();
   await expect(page).toHaveURL("/forgot-password");
   await expect(page.getByRole("form", { name: "重置密码", exact: true })).toBeVisible();
@@ -97,6 +98,7 @@ test("发码与登录限流遵循 Retry-After，不自动重试写请求", async
   await expect(
     page.getByRole("heading", { name: "欢迎回来", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   auth.rateLimitLogin = true;
   await fillEmail(page);
   await page.getByLabel("密码", { exact: true }).fill("password123");
@@ -116,6 +118,7 @@ test("CSRF 失效只刷新并提示，不自动重放登录；刷新失败不误
   const auth = await interceptAuthService(page);
   await interceptTaskApi(page);
   await page.goto("/login");
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   await fillEmail(page);
   await page.getByLabel("密码", { exact: true }).fill("password123");
   auth.invalidCsrfOnce = true;

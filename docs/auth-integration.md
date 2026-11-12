@@ -1,5 +1,7 @@
 # 用户认证接口对接
 
+新增用户名契约：[username-auth-api.md](../../focus-garden-server/docs/api/username-auth-api.md)。登录默认使用用户名，可切换邮箱；两种方式共用原 Session/CSRF。注册页面仍使用邮箱验证码流程，注册/重置成功后返回邮箱登录模式，普通首次访问默认用户名。用户名注册的 service/DTO 已同步，本阶段未扩展注册页面。
+
 权威契约：兄弟项目 [auth-api.md](../../focus-garden-server/docs/api/auth-api.md)，同时核对了 AuthController、SecurityConfig、WebConfig 和请求 DTO。后端已经采用 Spring Security + Spring Session JDBC + SMTP，前端不使用 JWT 或浏览器存储里的“已登录”标记。
 
 ## 已接入能力
@@ -8,7 +10,7 @@
 | --------------------- | ----------------------------- |
 | 内存 CSRF 初始化/刷新 | GET /api/auth/csrf            |
 | 会话恢复              | GET /api/users/me             |
-| 邮箱密码登录          | POST /api/auth/login          |
+| 用户名/邮箱密码登录          | POST /api/auth/login          |
 | 退出当前会话          | POST /api/auth/logout         |
 | 邮箱验证码            | POST /api/auth/email-codes    |
 | 注册                  | POST /api/auth/register       |
@@ -33,6 +35,8 @@
 - 浏览器重新聚焦/恢复网络会重新验证会话，避免长期沿用缓存身份。
 
 ## 表单契约
+
+用户名 trim 转小写，3–32 位 ASCII 字母、数字或下划线且字母开头；username/email 联合类型保证身份二选一，请求省略另一身份。UserVO.email 与 username 均允许 null，但至少有一种身份。用户名账号暂不支持邮箱找回密码，仅邮箱模式提供找回入口。切换方式保留各自输入，清空错误，但不清除限流。
 
 邮箱 trim 后转小写，支持 ASCII 邮箱，最多 254 字符；不移除加号或点。密码与新密码为 8–128 个 UTF-16 字符，支持 Unicode 和空格，原样提交，不 trim、不截断。
 
@@ -65,7 +69,7 @@ Playwright 仅拦截实际 HTTP 路径 `/api/auth/*`、`/api/users/me` 和任务
 
 已实机使用真实后端与浏览器确认：localhost/127.0.0.1 的开发代理获取 CSRF 均为 200、匿名 me 为 401、会话 Cookie 为 HttpOnly、登录表单可提交，浏览器存储未保存认证信息；不相关外部 Origin 仍返回 403。
 
-TypeScript、ESLint、生产构建通过，37 项单元测试与 46 项桌面/手机浏览器回归通过。
+TypeScript、ESLint、生产构建通过，39 项单元测试与 50 项桌面/手机浏览器回归通过。
 
 拦截式测试不等于真实账号/邮件/数据库验证。本轮没有创建真实用户、发送真实验证码邮件或使用用户的密码；需要后端服务与收信环境就绪后人工验证完整邮件链路。
 

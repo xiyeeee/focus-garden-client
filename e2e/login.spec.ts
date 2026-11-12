@@ -32,11 +32,9 @@ test("登录页直接访问与刷新、桌面双栏/手机表单优先，无横�
     exact: true,
   });
   await expect(artwork).toBeVisible();
-  expect(
-    await artwork.evaluate(
-      (element) => (element as HTMLImageElement).naturalWidth,
-    ),
-  ).toBeGreaterThan(0);
+  await expect.poll(() => artwork.evaluate(
+    (element) => (element as HTMLImageElement).naturalWidth,
+  )).toBeGreaterThan(0);
   const card = await page.locator(".fg-login-card").boundingBox();
   const story = await page.locator(".fg-login-story").boundingBox();
   if (testInfo.project.name === "mobile")
@@ -62,6 +60,7 @@ test("必填和邮箱格式反馈、密码可见切换，不发登录请求、�
     if (request.method() === "POST") posts.push(request.url());
   });
   await page.goto("/login");
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   const email = page.getByRole("textbox", { name: "邮箱", exact: true });
   const password = page.getByLabel("密码", { exact: true });
   await email.focus();
@@ -135,5 +134,5 @@ test("未登录没有返回首页入口，320px 与平板布局正常", async ({
   await expect(
     page.getByRole("link", { name: "专注花园首页", exact: true }),
   ).toHaveCount(0);
-  await expect(page.getByRole("link")).toHaveCount(3); // 表单跳转、注册、找回密码。
+  await expect(page.getByRole("link")).toHaveCount(2); // 用户名模式只展示注册与页脚入口。
 });

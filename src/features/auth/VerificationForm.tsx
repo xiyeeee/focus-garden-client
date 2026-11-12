@@ -109,7 +109,7 @@ export const VerificationForm = ({ mode }: { mode: "register" | "reset" }) => {
         });
         void navigate("/login", {
           replace: true,
-          state: { authNotice: "注册成功，请使用邮箱和密码登录。" },
+          state: { loginMode: "email", authNotice: "注册成功，请使用邮箱和密码登录。" },
         });
       } else {
         await authApi.resetPassword({
@@ -120,7 +120,7 @@ export const VerificationForm = ({ mode }: { mode: "register" | "reset" }) => {
         await clearSession();
         void navigate("/login", {
           replace: true,
-          state: { authNotice: "密码已重置，旧会话已失效，请重新登录。" },
+          state: { loginMode: "email", authNotice: "密码已重置，旧会话已失效，请重新登录。" },
         });
       }
     } catch (reason) {

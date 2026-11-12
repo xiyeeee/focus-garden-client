@@ -14,12 +14,18 @@ import type {
   UserVO,
 } from "./types";
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
+const normalizeIdentity = (body: LoginDTO) =>
+  body.username !== undefined
+    ? { username: body.username.trim().toLowerCase() }
+    : { email: normalizeEmail(body.email) };
 const readUser = (user: UserVO): UserVO => {
   if (
     !user ||
     typeof user.id !== "string" ||
     !/^[1-9]\d*$/.test(user.id) ||
-    typeof user.email !== "string" ||
+    (user.email !== null && typeof user.email !== "string") ||
+    (user.username !== null && typeof user.username !== "string") ||
+    (!user.email && !user.username) ||
     typeof user.nickname !== "string"
   )
     throw new ApiError(
@@ -50,7 +56,7 @@ export const authApi = {
   },
   login: async (body: LoginDTO) => {
     const response = await http.post<ApiResponse<UserVO>>("/auth/login", {
-      email: normalizeEmail(body.email),
+      ...normalizeIdentity(body),
       password: body.password,
     });
     const user = readUser(unwrapApiResponse(response.data));
@@ -88,8 +94,10 @@ export const authApi = {
   },
   register: async (body: RegisterDTO) => {
     const response = await http.post<ApiResponse<UserVO>>("/auth/register", {
-      ...body,
-      email: normalizeEmail(body.email),
+      password: body.password,
+      nickname: body.nickname,
+      ...normalizeIdentity(body),
+      ...(body.username === undefined ? { verificationCode: body.verificationCode } : {}),
     });
     return readUser(unwrapApiResponse(response.data));
   },

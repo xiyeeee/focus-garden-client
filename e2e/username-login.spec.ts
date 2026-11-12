@@ -1,0 +1,51 @@
+import { test, expect } from "@playwright/test";
+import { interceptAuthService } from "./fixtures/auth.ts";
+import { interceptTaskApi } from "./fixtures/task-api.ts";
+
+test("默认用户名登录，校验格式、原样密码、空邮箱会话刷新和退出", async ({ page }) => {
+  const auth = await interceptAuthService(page);
+  await interceptTaskApi(page);
+  await page.goto("/login");
+  await expect(page.getByRole("button", { name: "用户名登录", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("textbox", { name: "邮箱", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "忘记密码？", exact: true })).toHaveCount(0);
+  const username = page.getByRole("textbox", { name: "用户名", exact: true });
+  await username.fill("1invalid");
+  await page.getByLabel("密码", { exact: true }).fill("  密码 🌱 1234  ");
+  await page.getByRole("button", { name: "登录", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("以字母开头");
+  expect(auth.loginCalls).toBe(0);
+  await username.fill(" Garden_User ");
+  await page.getByRole("button", { name: "登录", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  expect(auth.lastLoginBody).toEqual({ username: "garden_user", password: "  密码 🌱 1234  " });
+  expect(auth.user.email).toBeNull();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "今日任务", level: 1 })).toBeVisible();
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page).toHaveURL("/login");
+});
+
+test("切换登录方式清除校验，保留各自账号，限流不能靠切换绕过", async ({ page }) => {
+  const auth = await interceptAuthService(page);
+  auth.failLogin = true;
+  await page.goto("/login");
+  await page.getByRole("textbox", { name: "用户名", exact: true }).fill("garden_user");
+  await page.getByLabel("密码", { exact: true }).fill("password123");
+  await page.getByRole("button", { name: "登录", exact: true }).click();
+  await expect(page.getByRole("alert")).toHaveText("用户名或密码错误");
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await page.getByRole("textbox", { name: "邮箱", exact: true }).fill(" GARDENER@Example.com ");
+  await page.getByRole("button", { name: "登录", exact: true }).click();
+  await expect(page.getByRole("alert")).toHaveText("邮箱或密码错误");
+  expect(auth.lastLoginBody).toEqual({ email: "gardener@example.com", password: "password123" });
+  await page.getByRole("button", { name: "用户名登录", exact: true }).click();
+  await expect(page.getByRole("textbox", { name: "用户名", exact: true })).toHaveValue("garden_user");
+  auth.rateLimitLogin = true;
+  await page.getByRole("button", { name: "登录", exact: true }).click();
+  await expect(page.getByRole("button", { name: /秒后重试/ })).toBeDisabled();
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
+  await expect(page.getByRole("button", { name: /秒后重试/ })).toBeDisabled();
+});

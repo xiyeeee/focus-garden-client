@@ -21,7 +21,7 @@ export const LoginPage = () => {
           {notice}
         </p>
       )}
-      <LoginForm onSubmit={login} />
+      <LoginForm onSubmit={login} initialMode={location.state?.loginMode === "email" ? "email" : "username"} />
     </AuthLayout>
   );
 };

@@ -14,6 +14,7 @@ import {
 const user = {
   id: "9223372036854775807",
   email: "gardener+tag@example.com",
+  username: null,
   nickname: "新朋友",
   avatarUrl: null,
   lastLoginAt: null,
@@ -130,6 +131,25 @@ describe("Session + CSRF 认证请求", () => {
     expect(
       requests.filter((request) => request.url === "/auth/login"),
     ).toHaveLength(1);
+  });
+  it("用户名登录规范化身份、保留密码且不发送邮箱，兼容无邮箱用户", async () => {
+    const adapter = http.defaults.adapter as import("axios").AxiosAdapter;
+    http.defaults.adapter = async (config) => {
+      const response = await adapter(config);
+      if (config.url === "/auth/login" || config.url === "/users/me")
+        response.data.data = { ...user, email: null, username: "garden_user" };
+      return response;
+    };
+    const session = await authApi.login({ username: " Garden_User ", password: "  密码 🌱 1234  " });
+    expect(session.user.email).toBeNull();
+    expect(session.user.username).toBe("garden_user");
+    expect(JSON.parse(requests.find((request) => request.url === "/auth/login")!.data)).toEqual({ username: "garden_user", password: "  密码 🌱 1234  " });
+    expect((await authApi.getSession())?.user.username).toBe("garden_user");
+  });
+  it("用户名注册只发送对应身份字段，不发验证码邮件", async () => {
+    await authApi.register({ username: " Garden_User ", password: "password123", nickname: "花友" });
+    expect(JSON.parse(requests.find((request) => request.url === "/auth/register")!.data)).toEqual({ username: "garden_user", password: "password123", nickname: "花友" });
+    expect(requests.some((request) => request.url === "/auth/email-codes")).toBe(false);
   });
   it("登录 POST 已成功而 CSRF 刷新失败时验证 me，不重放登录或误报密码错误", async () => {
     failCsrfAfterLogin = true;

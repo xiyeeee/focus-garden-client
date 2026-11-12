@@ -1,8 +1,7 @@
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-export type LoginErrors = Partial<Record<keyof LoginCredentials, string>>;
+import type { LoginDTO } from "@/services/auth/types";
+export type LoginCredentials = LoginDTO;
+export type LoginMode = "username" | "email";
+export type LoginErrors = Partial<Record<"identity" | "password", string>>;
 export type LoginSubmit = (credentials: LoginCredentials) => Promise<void>;
 export const validateEmail = (email: string) => {
   const value = email.trim();
@@ -21,14 +20,16 @@ export const validatePassword = (password: string) =>
     : password.length < 8 || password.length > 128
       ? "密码长度为 8–128 个字符"
       : undefined;
-export const validateLogin = ({
-  email,
-  password,
-}: LoginCredentials): LoginErrors => {
-  const errors: LoginErrors = {};
-  const emailError = validateEmail(email);
-  const passwordError = validatePassword(password);
-  if (emailError) errors.email = emailError;
-  if (passwordError) errors.password = passwordError;
-  return errors;
+export const validateUsername = (username: string) => {
+  if (!username.trim()) return "请输入用户名";
+  return /^[A-Za-z][A-Za-z0-9_]{2,31}$/.test(username.trim())
+    ? undefined
+    : "用户名为 3–32 位字母、数字或下划线，且以字母开头";
+};
+export const validateLogin = (credentials: LoginCredentials): LoginErrors => {
+  const identity = credentials.username !== undefined
+    ? validateUsername(credentials.username)
+    : validateEmail(credentials.email);
+  const password = validatePassword(credentials.password);
+  return { ...(identity ? { identity } : {}), ...(password ? { password } : {}) };
 };

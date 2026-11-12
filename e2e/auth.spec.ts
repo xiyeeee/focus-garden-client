@@ -40,6 +40,7 @@ test("服务确认登录后进入首页，设置只有退出登录，退出后�
   await interceptTaskApi(page, [taskFixture()]);
   await page.goto("/");
   await expect(page).toHaveURL("/login");
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   await page
     .getByRole("textbox", { name: "邮箱", exact: true })
     .fill("gardener@example.com");
@@ -79,6 +80,7 @@ test("登录和退出失败有反馈，登录失败不得跳首页，退出失�
   auth.failLogin = true;
   await interceptTaskApi(page);
   await page.goto("/login");
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   await page
     .getByRole("textbox", { name: "邮箱", exact: true })
     .fill("gardener@example.com");
@@ -141,6 +143,7 @@ test("退出清理业务缓存，下次登录不得复用上一位用户的任�
   await expect(page).toHaveURL("/login");
   auth.user = { ...auth.user, id: "2", email: "another@example.com" };
   tasks.tasks = [taskFixture({ id: "2", title: "新的任务" })];
+  await page.getByRole("button", { name: "邮箱登录", exact: true }).click();
   await page
     .getByRole("textbox", { name: "邮箱", exact: true })
     .fill("another@example.com");

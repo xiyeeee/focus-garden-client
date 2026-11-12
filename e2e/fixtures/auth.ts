@@ -31,9 +31,11 @@ export const interceptAuthService = async (
     lastPurpose: "",
     lastCode: "",
     lastPassword: "",
+    lastLoginBody: {} as Record<string, string>,
     user: {
       id: "1",
       email: "gardener@example.com",
+      username: null,
       nickname: "花园新朋友",
       avatarUrl: null,
       lastLoginAt: null,
@@ -112,6 +114,9 @@ export const interceptAuthService = async (
     const body = request.postDataJSON();
     if (action === "login") {
       state.loginCalls++;
+      state.lastLoginBody = body;
+      if (!!body.username === !!body.email || Object.keys(body).some((key) => !["username", "email", "password"].includes(key)))
+        return route.fulfill(failure(400, "BAD_REQUEST", "登录身份必须二选一"));
       if (state.rateLimitLogin)
         return route.fulfill({
           ...failure(429, "RATE_LIMITED", "请求过于频繁，请稍后重试"),
@@ -119,8 +124,9 @@ export const interceptAuthService = async (
         });
       if (state.failLogin)
         return route.fulfill(
-          failure(401, "INVALID_CREDENTIALS", "邮箱或密码错误"),
+          failure(401, "INVALID_CREDENTIALS", body.username ? "用户名或密码错误" : "邮箱或密码错误"),
         );
+      state.user = { ...state.user, username: body.username ?? null, email: body.email ?? null };
       state.authenticated = true;
       state.csrfVersion++;
       return route.fulfill(success(state.user));
