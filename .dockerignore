@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.idea
+.env
+.env.*
+!.env.example
+e2e
+test-results
+playwright-report
+coverage
+*.md
+.DS_Store
+public/design
