@@ -1,7 +1,9 @@
+import { interceptAuthService } from "./fixtures/auth.ts";
 import { interceptTaskApi } from "./fixtures/task-api.ts";
 import { test, expect, type Page } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
+  await interceptAuthService(page, true);
   await interceptTaskApi(page);
 });
 
@@ -45,16 +47,19 @@ test("所有页面可直接访问和刷新，资源正确加载，无横向溢�
       page.getByRole("heading", { level: 1, name: route.title }),
     ).toBeVisible();
     await expectNoOverflow(page);
-    const images = await page
-      .locator("main img")
-      .evaluateAll((elements) =>
-        elements.every(
-          (element) =>
-            (element as HTMLImageElement).complete &&
-            (element as HTMLImageElement).naturalWidth > 0,
-        ),
-      );
-    expect(images).toBe(true);
+    await expect
+      .poll(() =>
+        page
+          .locator("main img")
+          .evaluateAll((elements) =>
+            elements.every(
+              (element) =>
+                (element as HTMLImageElement).complete &&
+                (element as HTMLImageElement).naturalWidth > 0,
+            ),
+          ),
+      )
+      .toBe(true);
     if (route.navigation) {
       const mobile = testInfo.project.name === "mobile";
       await openNavigation(page, mobile);
@@ -192,7 +197,7 @@ test("只滚动主内容区，导航固定；切换路由回到内容顶部，�
   ).toBe("preserved-business-data");
 });
 
-test("320px 手机与平板宽度无溢出，设置占位表单不可操作", async ({ page }) => {
+test("320px 手机与平板宽度无溢出，设置仅包含退出登录", async ({ page }) => {
   for (const width of [320, 768, 1024]) {
     await page.setViewportSize({ width, height: 900 });
     for (const path of [
@@ -208,9 +213,12 @@ test("320px 手机与平板宽度无溢出，设置占位表单不可操作", as
     }
   }
   await page.goto("/settings");
-  await expect(page.getByLabel("默认专注时长")).toBeDisabled();
-  await expect(page.getByRole("switch", { name: "完成提示音" })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "退出登录", exact: true }),
+  ).toBeEnabled();
   await expect(
     page.getByRole("button", { name: "保存设置", exact: true }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
+  await expect(page.getByRole("switch")).toHaveCount(0);
+  await expect(page.locator("main input")).toHaveCount(0);
 });

@@ -5,7 +5,7 @@ import {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { http, ApiError } from "@/services/http";
+import { http, ApiError, clearCsrf } from "@/services/http";
 import { taskApi } from "./api";
 import { toTaskRecord, toTaskCreateDTO, toTaskUpdateDTO } from "./adapter";
 import type { TaskVO } from "./types";
@@ -31,9 +31,22 @@ const originalAdapter = http.defaults.adapter;
 let requests: InternalAxiosRequestConfig[];
 let nextBody: unknown;
 beforeEach(() => {
+  clearCsrf();
   requests = [];
   nextBody = { ...original };
   http.defaults.adapter = async (config) => {
+    if (config.url === "/auth/csrf")
+      return {
+        data: {
+          code: "OK",
+          message: "成功",
+          data: { headerName: "X-CSRF-TOKEN", token: "unit-test-csrf" },
+        },
+        status: 200,
+        statusText: "OK",
+        headers: new AxiosHeaders(),
+        config,
+      };
     requests.push(config);
     return {
       data: { code: "OK", message: "成功", data: nextBody },

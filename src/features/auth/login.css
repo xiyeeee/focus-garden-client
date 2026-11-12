@@ -1,0 +1,638 @@
+.fg-login-page {
+  --login-glow: #fff7d9;
+  --login-pink: #f7ede3;
+  --login-cream: #fff9ee;
+  --login-title: #434e2f;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      ellipse at 43% 11%,
+      color-mix(in srgb, var(--login-glow) 85%, transparent),
+      transparent 40%
+    ),
+    radial-gradient(ellipse at 90% 40%, var(--login-pink), transparent 55%),
+    var(--background);
+}
+.fg-login-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    130deg,
+    transparent 30%,
+    color-mix(in srgb, var(--login-glow) 70%, transparent) 37%,
+    transparent 43%,
+    color-mix(in srgb, var(--login-cream) 65%, transparent) 48%,
+    transparent 55%
+  );
+}
+.fg-login-header {
+  min-height: 88px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px clamp(26px, 3.3vw, 58px);
+  gap: 20px;
+}
+.fg-login-header .fg-brand {
+  flex-direction: row;
+  margin: 0;
+  gap: 10px;
+  font-size: 27px;
+  color: var(--login-title);
+}
+.fg-login-header .fg-brand small {
+  display: none;
+}
+.fg-login-header .fg-brand-mark {
+  width: 40px;
+  height: 40px;
+}
+.fg-login-header .fg-brand svg {
+  width: 37px;
+  height: 37px;
+}
+.fg-login-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1570px;
+  margin: auto;
+  padding: 12px clamp(32px, 4.4vw, 76px) 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(370px, 1fr);
+  align-items: center;
+  gap: clamp(26px, 3.4vw, 56px);
+}
+.fg-login-story {
+  min-width: 0;
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 5px;
+}
+.fg-login-story-copy {
+  position: relative;
+  z-index: 1;
+}
+.fg-login-story h1 {
+  font-size: clamp(29px, 2.65vw, 42px);
+  font-weight: 650;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--login-title);
+  text-wrap: initial;
+}
+.fg-login-story-copy > p {
+  font-family: var(--font-title);
+  font-size: clamp(16px, 1.5vw, 23px);
+  letter-spacing: 0.045em;
+  color: var(--muted-foreground);
+  margin-top: 8px;
+}
+.fg-login-artwork {
+  position: relative;
+  width: calc(100% + 45px);
+  margin: -5px -23px -10px;
+  min-height: 0;
+}
+.fg-login-artwork img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 680px;
+  object-fit: contain;
+  filter: drop-shadow(
+    0 18px 26px color-mix(in srgb, var(--warm-shadow) 8%, transparent)
+  );
+}
+.fg-login-firefly {
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  border-radius: 50%;
+  background: var(--primary-foreground);
+  box-shadow: 0 0 14px 5px
+    color-mix(in srgb, var(--login-glow) 85%, transparent);
+  pointer-events: none;
+  animation: fg-firefly 4s ease-in-out infinite;
+}
+.firefly-one {
+  top: 16%;
+  left: 16%;
+}
+.firefly-two {
+  top: 8%;
+  right: 27%;
+  animation-delay: -1.5s;
+}
+.firefly-three {
+  top: 36%;
+  right: 5%;
+  animation-delay: -2.5s;
+}
+.fg-login-card {
+  align-self: center;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--card) 84%, transparent),
+    color-mix(in srgb, var(--card-tint) 94%, transparent)
+  );
+  border: 1.5px solid
+    color-mix(in srgb, var(--primary-foreground) 85%, var(--border));
+  border-radius: 32px;
+  padding: clamp(27px, 2.4vw, 40px) clamp(28px, 3vw, 48px) 28px;
+  box-shadow:
+    0 16px 40px color-mix(in srgb, var(--warm-shadow) 13%, transparent),
+    inset 0 0 35px
+      color-mix(in srgb, var(--primary-foreground) 45%, transparent);
+  min-width: 0;
+  max-width: 550px;
+  width: 100%;
+  justify-self: end;
+}
+.fg-login-card-heading {
+  text-align: center;
+}
+.fg-login-seedling {
+  display: grid;
+  place-items: center;
+  width: 65px;
+  height: 65px;
+  border-radius: 20px;
+  margin: 0 auto 14px;
+  background: linear-gradient(145deg, var(--secondary), var(--accent));
+}
+.fg-login-seedling .fg-seedling {
+  width: 74px;
+  max-width: none;
+  height: 74px;
+  transform: translateY(-4px);
+}
+.fg-login-card h2 {
+  font-family: var(--font-title);
+  font-size: clamp(33px, 3vw, 43px);
+  color: var(--login-title);
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+.fg-login-card-heading > p {
+  font-family: var(--font-title);
+  font-size: 16px;
+  color: var(--muted-foreground);
+  letter-spacing: 0.035em;
+  margin-top: 7px;
+}
+.fg-login-form {
+  margin-top: 24px;
+}
+.fg-login-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.fg-login-field {
+  margin-top: 18px;
+}
+.fg-login-field:first-of-type {
+  margin-top: 0;
+}
+.fg-login-field > label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 9px;
+  color: var(--login-title);
+}
+.fg-login-input-wrap {
+  position: relative;
+}
+.fg-login-input-wrap > svg {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-hover);
+  pointer-events: none;
+}
+.fg-login-input-wrap input {
+  height: 49px;
+  font-size: 15px;
+  border-radius: 14px;
+  padding: 12px 48px;
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--muted-foreground) 25%, var(--border));
+  box-shadow: none;
+}
+.fg-login-input-wrap input::placeholder {
+  color: var(--subtle);
+}
+.fg-login-input-wrap input:focus-visible {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+.fg-login-input-wrap input[aria-invalid="true"] {
+  border-color: var(--destructive);
+}
+.fg-login-password-toggle[data-slot="button"] {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 39px;
+  height: 39px;
+  min-height: 39px;
+  padding: 0;
+  border-radius: 11px;
+  color: var(--muted-foreground);
+}
+.fg-login-password-toggle[data-slot="button"] svg {
+  width: 20px;
+  height: 20px;
+}
+.fg-login-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.fg-login-unavailable-link {
+  color: var(--muted-foreground);
+  font-family: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  opacity: 0.65;
+}
+.fg-login-submit[data-slot="button"] {
+  width: 100%;
+  height: 49px;
+  margin-top: 22px;
+  border-radius: 16px;
+  font-family: var(--font-title);
+  font-size: 21px;
+  letter-spacing: 0.16em;
+  background: linear-gradient(110deg, var(--primary), var(--primary-hover));
+}
+.fg-login-submit[data-slot="button"]:disabled {
+  opacity: 0.65;
+}
+.fg-login-service-note {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.fg-login-register {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  margin-top: 18px;
+}
+.fg-login-register .fg-login-unavailable-link {
+  font-size: 14px;
+  font-weight: 550;
+}
+.fg-login-encouragement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 8px;
+  background: color-mix(in srgb, var(--ochre-soft) 65%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-title);
+  color: var(--foreground);
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  margin-top: 26px;
+}
+.fg-login-encouragement svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.fg-login-field-error {
+  color: var(--destructive);
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.7;
+}
+.fg-login-submit-error {
+  color: var(--destructive);
+  font-size: 12px;
+  margin-top: 12px;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--destructive) 7%, var(--card));
+  border-radius: 10px;
+}
+.fg-login-footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 19px 24px 25px;
+  color: var(--muted-foreground);
+  font-family: var(--font-title);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+.fg-login-footer > span {
+  width: 64px;
+  height: 1px;
+  background: color-mix(in srgb, var(--muted-foreground) 45%, transparent);
+}
+.fg-visitor-avatar:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+@keyframes fg-firefly {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-7px);
+  }
+}
+@media (min-width: 1500px) {
+  .fg-login-header {
+    min-height: 100px;
+  }
+  .fg-login-main {
+    padding-top: 10px;
+    padding-bottom: 20px;
+  }
+  .fg-login-card {
+    padding-top: 34px;
+    padding-bottom: 30px;
+  }
+  .fg-login-form {
+    margin-top: 29px;
+  }
+  .fg-login-field {
+    margin-top: 22px;
+  }
+  .fg-login-input-wrap input {
+    height: 54px;
+  }
+  .fg-login-password-toggle[data-slot="button"] {
+    top: 7px;
+    right: 7px;
+  }
+  .fg-login-submit[data-slot="button"] {
+    height: 54px;
+    margin-top: 25px;
+  }
+  .fg-login-register {
+    margin-top: 21px;
+  }
+  .fg-login-encouragement {
+    margin-top: 30px;
+  }
+}
+@media (max-width: 1100px) {
+  .fg-login-main {
+    grid-template-columns: minmax(0, 1.1fr) minmax(350px, 1fr);
+    gap: 27px;
+    padding-inline: 30px;
+  }
+  .fg-login-story h1 {
+    font-size: 30px;
+    max-width: 430px;
+  }
+  .fg-login-story-copy > p {
+    font-size: 16px;
+    max-width: 350px;
+    line-height: 1.9;
+  }
+  .fg-login-card {
+    padding-inline: 27px;
+  }
+  .fg-login-card-heading > p {
+    font-size: 14px;
+  }
+  .fg-login-story {
+    justify-content: center;
+  }
+  .fg-login-artwork {
+    width: calc(100% + 35px);
+    margin-inline: -17px;
+    margin-top: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .fg-login-header {
+    min-height: 76px;
+    padding: 18px 25px;
+  }
+  .fg-login-header .fg-brand {
+    font-size: 23px;
+    gap: 7px;
+  }
+  .fg-login-header .fg-brand-mark,
+  .fg-login-header .fg-brand svg {
+    width: 32px;
+    height: 32px;
+  }
+  .fg-login-main {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 24px 22px;
+    gap: 30px;
+  }
+  .fg-login-card {
+    order: -1;
+    width: 100%;
+    max-width: 440px;
+    margin: auto;
+    padding: 26px 29px;
+  }
+  .fg-login-card h2 {
+    font-size: 35px;
+  }
+  .fg-login-story {
+    width: 100%;
+    max-width: 540px;
+    align-self: center;
+    text-align: center;
+  }
+  .fg-login-story h1 {
+    font-size: 25px;
+    max-width: none;
+  }
+  .fg-login-story-copy > p {
+    max-width: none;
+    font-size: 14px;
+    margin-top: 9px;
+  }
+  .fg-login-artwork {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .fg-login-story-copy {
+    padding-inline: 5px;
+  }
+  .fg-login-footer {
+    padding-top: 0;
+    gap: 16px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+  .fg-login-footer > span {
+    width: 35px;
+  }
+  .fg-login-input-wrap input {
+    font-size: 16px;
+  }
+}
+@media (max-width: 420px) {
+  .fg-login-header {
+    padding: 16px 18px;
+    min-height: 71px;
+    gap: 10px;
+  }
+  .fg-login-header .fg-brand {
+    font-size: 21px;
+    gap: 5px;
+  }
+  .fg-login-header .fg-brand-mark,
+  .fg-login-header .fg-brand svg {
+    width: 29px;
+    height: 29px;
+  }
+  .fg-login-main {
+    padding: 8px 16px 20px;
+    gap: 26px;
+  }
+  .fg-login-card {
+    padding: 24px 23px;
+    border-radius: 27px;
+  }
+  .fg-login-seedling {
+    width: 57px;
+    height: 57px;
+    margin-bottom: 10px;
+    border-radius: 17px;
+  }
+  .fg-login-seedling .fg-seedling {
+    width: 67px;
+    height: 67px;
+  }
+  .fg-login-card h2 {
+    font-size: 32px;
+  }
+  .fg-login-card-heading > p {
+    font-size: 13px;
+  }
+  .fg-login-form {
+    margin-top: 22px;
+  }
+  .fg-login-field > label {
+    font-size: 14px;
+  }
+  .fg-login-field {
+    margin-top: 17px;
+  }
+  .fg-login-encouragement {
+    font-size: 12px;
+    gap: 6px;
+    padding: 10px 6px;
+    margin-top: 22px;
+  }
+  .fg-login-encouragement svg {
+    width: 16px;
+    height: 16px;
+  }
+  .fg-login-register {
+    font-size: 13px;
+    margin-top: 15px;
+  }
+  .fg-login-register .fg-login-unavailable-link {
+    font-size: 13px;
+  }
+  .fg-login-story h1 {
+    font-size: 23px;
+  }
+  .fg-login-story-copy > p {
+    font-size: 12px;
+  }
+  .fg-login-footer {
+    font-size: 10px;
+    gap: 10px;
+    padding-inline: 16px;
+  }
+  .fg-login-footer > span {
+    width: 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fg-login-firefly {
+    animation: none;
+  }
+}
+
+.fg-auth-text-link {
+  color: var(--primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 13px;
+  padding: 2px 0;
+}
+.fg-auth-text-link:hover {
+  color: var(--foreground);
+}
+.fg-login-register .fg-auth-text-link {
+  font-size: 14px;
+  font-weight: 550;
+}
+.fg-auth-code-field input {
+  padding-right: 132px;
+}
+.fg-auth-code-button[data-slot="button"] {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  min-height: 39px;
+  height: 39px;
+  font-size: 11px;
+  padding: 0 10px;
+  color: var(--primary-hover);
+}
+.fg-auth-success {
+  color: var(--primary-hover);
+  background: var(--accent);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 15px;
+}
+@media (min-width: 1500px) {
+  .fg-auth-code-button[data-slot="button"] {
+    top: 7px;
+    right: 7px;
+  }
+}

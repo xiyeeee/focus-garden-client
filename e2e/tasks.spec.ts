@@ -1,5 +1,10 @@
+import { interceptAuthService } from "./fixtures/auth.ts";
 import { test, expect } from "@playwright/test";
 import { interceptTaskApi, taskFixture } from "./fixtures/task-api.ts";
+test.beforeEach(async ({ page }) => {
+  await interceptAuthService(page, true);
+});
+
 const editTask = async (
   page: import("@playwright/test").Page,
   title: string,
@@ -18,7 +23,9 @@ test("真实契约 CRUD：新增、读取详情、编辑保留 IN_PROGRESS、完
     page.getByRole("heading", { name: "后端任务", exact: true }),
   ).toBeVisible();
   await editTask(page, "后端任务");
-  await expect(page.getByRole("dialog").getByLabel("任务名称")).toHaveValue("后端任务");
+  await expect(page.getByRole("dialog").getByLabel("任务名称")).toHaveValue(
+    "后端任务",
+  );
   await page.getByRole("dialog").getByLabel("任务名称").fill("修改后的任务");
   await page.getByLabel("备注").fill("  保留备注  ");
   await page.getByRole("button", { name: "保存修改", exact: true }).click();
@@ -87,11 +94,9 @@ test("分页、搜索、三态过滤和删除末页回退，统计不拿第一�
   );
   const state = await interceptTaskApi(page, initial);
   await page.goto("/");
-  const total = page
-    .locator(".fg-statistic")
-    .filter({
-      has: page.getByRole("heading", { name: "任务总数", exact: true }),
-    });
+  const total = page.locator(".fg-statistic").filter({
+    has: page.getByRole("heading", { name: "任务总数", exact: true }),
+  });
   await expect(total.locator("strong")).toHaveText("11");
   await page.getByRole("button", { name: "下一页" }).click();
   await expect(
@@ -141,7 +146,9 @@ test("空白校验、保存失败保留输入、保存中防重复提交，GET �
   await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
     "title：",
   );
-  await expect(page.getByRole("dialog").getByLabel("任务名称")).toHaveValue("保留输入");
+  await expect(page.getByRole("dialog").getByLabel("任务名称")).toHaveValue(
+    "保留输入",
+  );
   expect(state.writes).toHaveLength(1);
   state.failCreate = false;
   state.delayCreate = 500;
@@ -176,7 +183,9 @@ test("详情不存在可反馈并关闭，编辑/删除失败保留弹窗", asyn
   await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
     "备注内容",
   );
-  await expect(page.getByRole("dialog").getByLabel("任务名称")).toHaveValue("未保存的名称");
+  await expect(page.getByRole("dialog").getByLabel("任务名称")).toHaveValue(
+    "未保存的名称",
+  );
   await page.getByRole("button", { name: "取消", exact: true }).click();
   state.failDelete = true;
   await page.getByRole("button", { name: "更多操作：后端任务" }).click();

@@ -1,16 +1,7 @@
-import { http, ApiError } from "@/services/http";
+import { http, ApiError, unwrapApiResponse as unwrap } from "@/services/http";
 import type { TaskDraft, TaskRecord } from "@/features/tasks/task-model";
 import type { ApiResponse, PageResponse, TaskQueryDTO, TaskVO } from "./types";
 import { toTaskRecord, toTaskCreateDTO, toTaskUpdateDTO } from "./adapter";
-const unwrap = <T>(body: ApiResponse<T>): T => {
-  if (!body || body.code !== "OK" || !Object.hasOwn(body, "data"))
-    throw new ApiError(
-      "接口响应格式不正确，请检查 API 地址与代理配置。",
-      null,
-      "INVALID_RESPONSE",
-    );
-  return body.data;
-};
 const taskPath = (id: string) => {
   if (!/^[1-9]\d*$/.test(id))
     throw new ApiError("任务 ID 无效。", 400, "BAD_REQUEST");

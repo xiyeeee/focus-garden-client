@@ -63,6 +63,8 @@ export const interceptTaskApi = async (page: Page, initial: TaskVO[] = []) => {
         return failure(404, "NOT_FOUND", "任务不存在");
       return success(task);
     }
+    if (!request.headers()["x-csrf-token"])
+      return failure(403, "CSRF_INVALID", "任务写请求缺少 CSRF");
     const body = request.postData()
       ? (request.postDataJSON() as Record<string, unknown>)
       : undefined;

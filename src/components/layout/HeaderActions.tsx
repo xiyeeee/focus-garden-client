@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { Sun, UserRound } from "lucide-react";
 export const HeaderActions = () => (
   <div className="fg-header-actions">
@@ -10,12 +11,13 @@ export const HeaderActions = () => (
       <Sun size={22} aria-hidden="true" />
     </span>
     <span className="fg-action-divider" />
-    <span
+    <Link
+      to="/settings"
       className="fg-visitor-avatar"
-      role="img"
-      aria-label="访客头像，账号功能暂未开放"
+      aria-label="账号设置"
+      title="账号设置"
     >
       <UserRound size={23} aria-hidden="true" />
-    </span>
+    </Link>
   </div>
 );

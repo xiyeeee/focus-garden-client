@@ -18,7 +18,16 @@ export interface ApiErrorResponse {
     | "METHOD_NOT_ALLOWED"
     | "NOT_ACCEPTABLE"
     | "UNSUPPORTED_MEDIA_TYPE"
-    | "INTERNAL_SERVER_ERROR";
+    | "INTERNAL_SERVER_ERROR"
+    | "UNAUTHORIZED"
+    | "FORBIDDEN"
+    | "INVALID_CREDENTIALS"
+    | "EMAIL_ALREADY_REGISTERED"
+    | "VERIFICATION_INVALID"
+    | "CSRF_INVALID"
+    | "RATE_LIMITED"
+    | "MAIL_UNAVAILABLE"
+    | "SERVICE_UNAVAILABLE";
   message: string;
   data: null;
 }
