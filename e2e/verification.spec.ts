@@ -28,7 +28,7 @@ test("注册发码保留前导零，成功回登录但不自动进入首页", as
   expect(auth.lastPurpose).toBe("REGISTER");
   await expect(page.getByRole("button", { name: /秒后重发/ })).toBeDisabled();
   await page.getByLabel("邮箱验证码", { exact: true }).fill("012345");
-  await page.getByLabel("昵称（选填）", { exact: true }).fill("测试花园");
+  await page.getByLabel("昵称 / 登录用户名（选填）", { exact: true }).fill("测试花园");
   await fillPasswords(page);
   await page.screenshot({
     path: `test-results/register-${testInfo.project.name}.png`,

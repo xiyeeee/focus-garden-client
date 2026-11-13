@@ -94,6 +94,8 @@ export const VerificationForm = ({ mode }: { mode: "register" | "reset" }) => {
       nextErrors.confirmation = "两次输入的密码不一致";
     if (registering && values.nickname.length > 30)
       nextErrors.nickname = "昵称最多 30 个字符";
+    if (registering && /[@\x00-\x1f\x7f]/.test(values.nickname))
+      nextErrors.nickname = "昵称不能包含 @ 或控制字符";
     setErrors(nextErrors);
     setError("");
     if (Object.keys(nextErrors).length) return;
@@ -109,7 +111,9 @@ export const VerificationForm = ({ mode }: { mode: "register" | "reset" }) => {
         });
         void navigate("/login", {
           replace: true,
-          state: { loginMode: "email", authNotice: "注册成功，请使用邮箱和密码登录。" },
+          state: { loginMode: "email", authNotice: values.nickname.trim()
+            ? "注册成功，可使用邮箱或刚填写的昵称和密码登录。"
+            : "注册成功，请使用邮箱和密码登录。" },
         });
       } else {
         await authApi.resetPassword({
@@ -192,11 +196,11 @@ export const VerificationForm = ({ mode }: { mode: "register" | "reset" }) => {
         {registering && (
           <AuthTextField
             id="auth-nickname"
-            label="昵称（选填）"
+            label="昵称 / 登录用户名（选填）"
             icon={UserRound}
             autoComplete="nickname"
             maxLength={30}
-            placeholder="花园新朋友"
+            placeholder="填写后也可用于登录，支持中文，不可重复"
             value={values.nickname}
             onChange={(event) => change("nickname", event.target.value)}
             error={errors.nickname}
