@@ -1,5 +1,7 @@
 # 专注花园
 
+自动测试、推送阿里云镜像和SSH发布配置见 [GitHub Actions部署说明](docs/deployment/github-actions.md)。需在仓库配置ACR和SSH Secrets后才能部署。
+
 Vite + React + TypeScript 前端，沿用奶油色、鼠尾草绿、衬线标题与圆角卡片。**任务页现已对接 Spring Boot 任务 API**，具备新增、编辑、删除、完成/重新打开、名称搜索、三态筛选与分页。专注、成长记录和收藏仍是骨架；设置页仅保留退出登录。用户名/邮箱登录、Session 恢复、退出、注册、验证码及密码重置均已按后端实际契约接入。未登录先进入登录页，登录成功后进入首页。
 
 ## 启动

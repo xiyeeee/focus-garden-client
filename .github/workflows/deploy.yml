@@ -1,0 +1,96 @@
+name: 前端测试与自动部署
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  ACR_REGISTRY: crpi-ow7mi2apt624v3c8.cn-heyuan.personal.cr.aliyuncs.com
+  IMAGE_NAME: xiye-docker/focus-garden-web
+
+jobs:
+  verify:
+    name: 前端测试与生产构建
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: 安装项目固定版本的 pnpm 和依赖
+        run: |
+          npm install --global pnpm@10.34.9
+          pnpm install --frozen-lockfile
+      - name: 单元测试与 TypeScript / Vite 构建
+        run: |
+          python3 .github/scripts/test_deploy.py
+          pnpm test
+          pnpm build
+
+  publish-deploy:
+    name: 推送 ACR 并更新线上前端
+    needs: verify
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: 检查发布凭据
+        env:
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          for name in ACR_USERNAME ACR_PASSWORD SSH_PRIVATE_KEY SSH_KNOWN_HOSTS; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::缺少 GitHub Secret: $name"
+              exit 1
+            fi
+          done
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: 构建并推送 linux/amd64 镜像
+        id: image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+      - name: SSH 发布、检查健康并记录镜像版本
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_HOST: ${{ vars.SSH_HOST || '47.121.214.43' }}
+          SSH_PORT: ${{ vars.SSH_PORT || '22' }}
+          SSH_USER: ${{ vars.SSH_USER || 'root' }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/docker/focus-garden' }}
+          DEPLOY_SERVICE: web
+          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
+        run: bash .github/scripts/ssh-deploy.sh
